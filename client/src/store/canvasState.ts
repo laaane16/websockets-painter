@@ -45,6 +45,13 @@ export const useStore = create<CanvasSchema>((set) => ({
         const prevState = state.undoList.pop() as string;
         state.redoList.push(state.canvas?.toDataURL() || '');
 
+        state.socket?.send(
+          JSON.stringify({
+            id: state.session,
+            method: 'undo',
+          }),
+        );
+
         const img = new Image();
         img.src = prevState;
         img.onload = () => {
@@ -70,7 +77,7 @@ export const useStore = create<CanvasSchema>((set) => ({
           ctx?.drawImage(img, 0, 0, state.canvas?.width || 0, state.canvas?.height || 0);
         };
       } else {
-        console.log('Невозможно пролистать на предыдущую страницу');
+        console.log('Невозможно пролистать на следуюшую страницу');
       }
       return state;
     }),

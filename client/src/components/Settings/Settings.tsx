@@ -4,6 +4,7 @@ import Container from '../Container/Container';
 
 import styles from './Settings.module.scss';
 import { useToolStore } from '../../store/toolState';
+import Input from '../Input/Input';
 
 interface Props {
   className?: string;
@@ -18,7 +19,7 @@ const Settings: FC<Props> = (props) => {
         <label htmlFor="line-width" className={styles.title}>
           Line width
         </label>
-        <input
+        <Input
           id="line-width"
           className={styles.input}
           min={1}
@@ -32,7 +33,8 @@ const Settings: FC<Props> = (props) => {
         <label htmlFor="stroke-color" className={styles.title}>
           Stroke color
         </label>
-        <input
+        <Input
+          style={{ padding: '2px' }}
           id="stroke-color"
           className={styles.input}
           onChange={(e) => setStrokeColor(e.target.value)}

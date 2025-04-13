@@ -5,6 +5,10 @@ import { CanvasSchema, useStore } from '../../store/canvasState';
 import { ToolSchema, useToolStore } from '../../store/toolState';
 import { Tool } from '../../tools/Tool';
 import { Brush } from '../../tools/Brush';
+import { Rect } from '../../tools/Rect';
+import { Circle } from '../../tools/Circle';
+import { Eraser } from '../../tools/Eraser';
+import { Line } from '../../tools/Line';
 
 interface Props {
   className?: string;
@@ -27,7 +31,6 @@ const Canvas: FC<Props> = (props) => {
 
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:5000');
-    console.log(session);
     setTool(new Brush(canvasRef.current as HTMLCanvasElement, socket, session));
     setSocket(socket);
     setSession(id);
@@ -68,21 +71,95 @@ const Canvas: FC<Props> = (props) => {
           preparedMsg.figure.x,
           preparedMsg.figure.y,
         );
+        break;
+      case 'rect':
+        Rect.staticDraw(
+          canvasRef.current?.getContext('2d') as CanvasRenderingContext2D,
+          preparedMsg.figure.x,
+          preparedMsg.figure.y,
+          preparedMsg.figure.width,
+          preparedMsg.figure.height,
+        );
+        break;
+      case 'circle':
+        Circle.staticDraw(
+          canvasRef.current?.getContext('2d') as CanvasRenderingContext2D,
+          preparedMsg.figure.x,
+          preparedMsg.figure.y,
+          preparedMsg.figure.width,
+          preparedMsg.figure.height,
+        );
+        break;
+      case 'eraser':
+        Eraser.draw(
+          canvasRef.current?.getContext('2d') as CanvasRenderingContext2D,
+          preparedMsg.figure.x,
+          preparedMsg.figure.y,
+        );
+        break;
+      case 'line':
+        Line.staticDraw(
+          canvasRef.current?.getContext('2d') as CanvasRenderingContext2D,
+          preparedMsg.figure.startX,
+          preparedMsg.figure.startY,
+          preparedMsg.figure.x,
+          preparedMsg.figure.y,
+        );
     }
   };
 
   useEffect(() => {
     if (canvasRef.current) {
       setCanvas(canvasRef.current);
+      fetch(`http://localhost:5000/image?id=${id}`)
+        .then((data) => data.json())
+        .then((res) => {
+          const image = new Image();
+          image.src = res;
+          image.onload = () => {
+            canvasRef.current
+              ?.getContext('2d')
+              ?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            canvasRef.current
+              ?.getContext('2d')
+              ?.drawImage(image, 0, 0, canvasRef.current.width, canvasRef.current.height);
+          };
+        });
     }
   }, []);
+
+  const mouseDownHandler = async () => {
+    pushToUndo(canvasRef.current?.toDataURL() || '');
+  };
+
+  const mouseUpHandler = async () => {
+    const imageData = canvasRef.current?.toDataURL();
+    try {
+      const res = await fetch(`http://localhost:5000/image?id=${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          img: imageData || '',
+        }),
+      });
+      if (!res.ok) {
+        throw new Error('error');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <div className={styles.canvasContainer}>
       <canvas
-        onMouseDown={() => pushToUndo(canvasRef.current?.toDataURL() || '')}
+        onMouseUp={mouseUpHandler}
+        onMouseDown={mouseDownHandler}
         ref={canvasRef}
-        width={800}
-        height={600}
+        width={1200}
+        height={700}
         className={styles.canvas}
       />
     </div>

@@ -9,6 +9,7 @@ import styles from './App.module.scss';
 import Modal from './components/Modal/Modal';
 import { useStore } from './store/canvasState';
 import { Brush } from './tools/Brush';
+import Input from './components/Input/Input';
 
 const App: FC = () => {
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -35,7 +36,7 @@ const App: FC = () => {
               <Modal
                 content={
                   <div style={{ width: '300px', height: '300px' }}>
-                    <input ref={usernameRef} type="text" />
+                    <Input ref={usernameRef} type="text" />
                     <button onClick={handleBtnClick}>Войти</button>
                   </div>
                 }

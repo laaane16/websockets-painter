@@ -16,7 +16,22 @@ export class Rect extends Tool {
   }
 
   mouseUpHandler(e: MouseEvent): void {
+    const width = e.offsetX - this.startX;
+    const height = e.offsetY - this.startY;
     this.mouseDown = false;
+    this.socket.send(
+      JSON.stringify({
+        id: this.session,
+        method: 'draw',
+        figure: {
+          tool: 'rect',
+          x: this.startX,
+          y: this.startY,
+          width,
+          height,
+        },
+      }),
+    );
   }
 
   mouseDownHandler(e: MouseEvent): void {
@@ -28,9 +43,9 @@ export class Rect extends Tool {
   }
 
   mouseMoveHandler(e: MouseEvent): void {
+    const width = e.offsetX - this.startX;
+    const height = e.offsetY - this.startY;
     if (this.mouseDown) {
-      const width = e.offsetX - this.startX;
-      const height = e.offsetY - this.startY;
       this.draw(this.startX, this.startY, width, height);
     }
   }
@@ -47,5 +62,12 @@ export class Rect extends Tool {
       this.ctx.fill();
       this.ctx.stroke();
     };
+  }
+
+  static staticDraw(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    ctx.fill();
+    ctx.stroke();
   }
 }

@@ -19,6 +19,7 @@ import { useToolStore } from '../../store/toolState';
 import { useStore } from '../../store/canvasState';
 import { Eraser } from '../../tools/Eraser';
 import { Line } from '../../tools/Line';
+import Input from '../Input/Input';
 
 interface Props {
   className?: string;
@@ -33,6 +34,16 @@ const Toolbar: FC<Props> = (props) => {
   const setFill = useToolStore((state) => state.setFill);
   const undo = useStore((state) => state.undo);
   const redo = useStore((state) => state.redo);
+
+  const saveHandler = () => {
+    const src = canvas?.toDataURL() || '';
+    const a = document.createElement('a');
+    a.href = src;
+    a.download = session + '.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   return (
     <div className={styles.toolbar}>
@@ -52,24 +63,30 @@ const Toolbar: FC<Props> = (props) => {
           </li>
           <li
             className={styles.item}
-            onClick={() => setNewTool(new Circle(canvas as HTMLCanvasElement))}
+            onClick={() => setNewTool(new Circle(canvas as HTMLCanvasElement, socket, session))}
           >
             <CircleSvg />
           </li>
           <li
             className={styles.item}
-            onClick={() => setNewTool(new Line(canvas as HTMLCanvasElement))}
+            onClick={() => setNewTool(new Line(canvas as HTMLCanvasElement, socket, session))}
           >
             <LineSvg />
           </li>
           <li
             className={styles.item}
-            onClick={() => setNewTool(new Eraser(canvas as HTMLCanvasElement))}
+            onClick={() => setNewTool(new Eraser(canvas as HTMLCanvasElement, socket, session))}
           >
             <EraserSvg />
           </li>
           <li>
-            <input onChange={(e) => setFill(e.target.value)} type="color" name="" id="" />
+            <Input
+              style={{ padding: '2px' }}
+              onChange={(e) => setFill(e.target.value)}
+              type="color"
+              name=""
+              id=""
+            />
           </li>
         </ul>
         <ul className={styles.appTools}>
@@ -79,7 +96,7 @@ const Toolbar: FC<Props> = (props) => {
           <li className={styles.item} onClick={redo}>
             <RedoSvg />
           </li>
-          <li className={styles.item}>
+          <li onClick={saveHandler} className={styles.item}>
             <SaveSvg />
           </li>
         </ul>

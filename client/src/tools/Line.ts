@@ -6,8 +6,8 @@ export class Line extends Tool {
   startY: number = 0;
   saved: string = '';
 
-  constructor(canvas: HTMLCanvasElement) {
-    super(canvas);
+  constructor(canvas: HTMLCanvasElement, socket: WebSocket, session: string) {
+    super(canvas, socket, session);
     this.listenEvents({
       mouseUpHandler: this.mouseUpHandler,
       mouseDownHandler: this.mouseDownHandler,
@@ -17,6 +17,19 @@ export class Line extends Tool {
 
   mouseUpHandler(e: MouseEvent): void {
     this.mouseDown = false;
+    this.socket.send(
+      JSON.stringify({
+        id: this.session,
+        method: 'draw',
+        figure: {
+          tool: 'line',
+          startX: this.startX,
+          startY: this.startY,
+          x: e.offsetX,
+          y: e.offsetY,
+        },
+      }),
+    );
   }
 
   mouseDownHandler(e: MouseEvent): void {
@@ -46,5 +59,19 @@ export class Line extends Tool {
       this.ctx.lineTo(x, y);
       this.ctx.stroke();
     };
+  }
+
+  static staticDraw(
+    ctx: CanvasRenderingContext2D,
+    startX: number,
+    startY: number,
+    x: number,
+    y: number,
+  ) {
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(x, y);
+    ctx.fill();
+    ctx.stroke();
   }
 }

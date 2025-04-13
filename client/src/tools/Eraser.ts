@@ -3,8 +3,8 @@ import { Tool } from './Tool';
 export class Eraser extends Tool {
   mouseDown: boolean = false;
 
-  constructor(canvas: HTMLCanvasElement) {
-    super(canvas);
+  constructor(canvas: HTMLCanvasElement, socket: WebSocket, session: string) {
+    super(canvas, socket, session);
     this.listenEvents({
       mouseUpHandler: this.mouseUpHandler,
       mouseDownHandler: this.mouseDownHandler,
@@ -14,6 +14,12 @@ export class Eraser extends Tool {
 
   mouseUpHandler(e: MouseEvent): void {
     this.mouseDown = false;
+    this.socket.send(
+      JSON.stringify({
+        id: this.session,
+        method: 'finish',
+      }),
+    );
   }
 
   mouseDownHandler(e: MouseEvent): void {
@@ -24,13 +30,24 @@ export class Eraser extends Tool {
 
   mouseMoveHandler(e: MouseEvent): void {
     if (this.mouseDown) {
-      this.draw(e.offsetX, e.offsetY);
+      // this.draw(e.offsetX, e.offsetY);
+      this.socket.send(
+        JSON.stringify({
+          id: this.session,
+          method: 'draw',
+          figure: {
+            tool: 'eraser',
+            x: e.offsetX,
+            y: e.offsetY,
+          },
+        }),
+      );
     }
   }
 
-  draw(x: number, y: number) {
-    this.ctx.strokeStyle = 'white';
-    this.ctx.lineTo(x, y);
-    this.ctx.stroke();
+  static draw(ctx: CanvasRenderingContext2D, x: number, y: number) {
+    ctx.strokeStyle = 'white';
+    ctx.lineTo(x, y);
+    ctx.stroke();
   }
 }
