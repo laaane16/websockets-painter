@@ -15,18 +15,25 @@ const Settings: FC<Props> = (props) => {
   return (
     <div className={styles.settings}>
       <Container className={styles.settingsContent}>
-        <span className={styles.title}>Толщина линии</span>
+        <label htmlFor="line-width" className={styles.title}>
+          Line width
+        </label>
         <input
+          id="line-width"
           className={styles.input}
           min={1}
           max={50}
           defaultValue={1}
           onChange={(e) => setStrokeWidth(Number(e.target.value))}
           type="number"
+          style={{ marginRight: '15px' }}
         />
 
-        <span className={styles.title}>Цвет обводки</span>
+        <label htmlFor="stroke-color" className={styles.title}>
+          Stroke color
+        </label>
         <input
+          id="stroke-color"
           className={styles.input}
           onChange={(e) => setStrokeColor(e.target.value)}
           type="color"

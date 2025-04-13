@@ -38,19 +38,34 @@ const Toolbar: FC<Props> = (props) => {
     <div className={styles.toolbar}>
       <Container className={styles.toolbarContent}>
         <ul className={styles.canvasTools}>
-          <li onClick={() => setNewTool(new Brush(canvas as HTMLCanvasElement, socket, session))}>
+          <li
+            className={styles.item}
+            onClick={() => setNewTool(new Brush(canvas as HTMLCanvasElement, socket, session))}
+          >
             <BrushSvg />
           </li>
-          <li onClick={() => setNewTool(new Rect(canvas as HTMLCanvasElement, socket, session))}>
+          <li
+            className={styles.item}
+            onClick={() => setNewTool(new Rect(canvas as HTMLCanvasElement, socket, session))}
+          >
             <RectSvg />
           </li>
-          <li onClick={() => setNewTool(new Circle(canvas as HTMLCanvasElement))}>
+          <li
+            className={styles.item}
+            onClick={() => setNewTool(new Circle(canvas as HTMLCanvasElement))}
+          >
             <CircleSvg />
           </li>
-          <li onClick={() => setNewTool(new Line(canvas as HTMLCanvasElement))}>
+          <li
+            className={styles.item}
+            onClick={() => setNewTool(new Line(canvas as HTMLCanvasElement))}
+          >
             <LineSvg />
           </li>
-          <li onClick={() => setNewTool(new Eraser(canvas as HTMLCanvasElement))}>
+          <li
+            className={styles.item}
+            onClick={() => setNewTool(new Eraser(canvas as HTMLCanvasElement))}
+          >
             <EraserSvg />
           </li>
           <li>
@@ -58,13 +73,13 @@ const Toolbar: FC<Props> = (props) => {
           </li>
         </ul>
         <ul className={styles.appTools}>
-          <li onClick={undo}>
+          <li className={styles.item} onClick={undo}>
             <UndoSvg />
           </li>
-          <li onClick={redo}>
+          <li className={styles.item} onClick={redo}>
             <RedoSvg />
           </li>
-          <li>
+          <li className={styles.item}>
             <SaveSvg />
           </li>
         </ul>

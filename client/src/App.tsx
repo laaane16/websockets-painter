@@ -1,5 +1,6 @@
 import { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
+import './styles/index.scss';
 
 import Header from './components/Header/Header';
 import Canvas from './components/Canvas/Canvas';
@@ -25,7 +26,10 @@ const App: FC = () => {
       <Route
         path="/:id"
         element={
-          <div className={styles.app}>
+          <div className={`app-dark-theme ${styles.app}`}>
+            <div className={styles.smallBlur}></div>
+            <div className={styles.midBlur}></div>
+            <div className={styles.largeBlur}></div>
             <Header />
             <main className={styles.main}>
               <Modal
