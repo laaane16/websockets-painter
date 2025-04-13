@@ -1,0 +1,11 @@
+.canvasContainer {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas {
+  border: 1px solid #ccc;
+  background-color: white;
+}

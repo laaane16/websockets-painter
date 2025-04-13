@@ -1,0 +1,23 @@
+.toolbar {
+  box-shadow: 0px 4px 4px 0px #00000040;
+}
+
+.toolbarContent {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.canvasTools,
+.appTools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  & li,
+  input {
+    cursor: pointer;
+  }
+}
