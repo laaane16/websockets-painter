@@ -45,6 +45,7 @@ app.ws('/', (ws, req) => {
         broadcastConnection(ws, parsedMsg);
       case 'finish':
         broadcastConnection(ws, parsedMsg)
+    
     }
   })
 })

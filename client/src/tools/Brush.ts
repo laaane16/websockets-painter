@@ -40,6 +40,7 @@ export class Brush extends Tool {
             x: e.offsetX,
             y: e.offsetY,
           },
+          ...this.getOptions(),
         }),
       );
     }

@@ -30,6 +30,7 @@ export class Rect extends Tool {
           width,
           height,
         },
+        ...this.getOptions(),
       }),
     );
   }

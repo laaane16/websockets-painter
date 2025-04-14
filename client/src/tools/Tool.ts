@@ -27,6 +27,14 @@ export class Tool {
     this.ctx.fillStyle = color;
   }
 
+  getOptions() {
+    return {
+      lineWidth: this.ctx.lineWidth,
+      strokeColor: this.ctx.strokeStyle,
+      fillColor: this.ctx.fillStyle,
+    };
+  }
+
   listenEvents({
     mouseMoveHadler,
     mouseDownHandler,

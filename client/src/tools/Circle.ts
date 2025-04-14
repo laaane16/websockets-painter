@@ -30,6 +30,7 @@ export class Circle extends Tool {
           width,
           height,
         },
+        ...this.getOptions(),
       }),
     );
   }

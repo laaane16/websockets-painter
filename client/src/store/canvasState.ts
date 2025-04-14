@@ -48,16 +48,13 @@ export const useStore = create<CanvasSchema>((set) => ({
         state.socket?.send(
           JSON.stringify({
             id: state.session,
-            method: 'undo',
+            method: 'draw',
+            figure: {
+              tool: 'undo',
+              img: prevState,
+            },
           }),
         );
-
-        const img = new Image();
-        img.src = prevState;
-        img.onload = () => {
-          ctx?.clearRect(0, 0, state.canvas?.width || 0, state.canvas?.height || 0);
-          ctx?.drawImage(img, 0, 0, state.canvas?.width || 0, state.canvas?.height || 0);
-        };
       } else {
         console.log('Невозможно пролистать на предыдущую страницу');
       }
@@ -70,12 +67,16 @@ export const useStore = create<CanvasSchema>((set) => ({
         const nextState = state.redoList.pop() as string;
         state.undoList.push(state.canvas?.toDataURL() || '');
 
-        const img = new Image();
-        img.src = nextState;
-        img.onload = () => {
-          ctx?.clearRect(0, 0, state.canvas?.width || 0, state.canvas?.height || 0);
-          ctx?.drawImage(img, 0, 0, state.canvas?.width || 0, state.canvas?.height || 0);
-        };
+        state.socket?.send(
+          JSON.stringify({
+            id: state.session,
+            method: 'draw',
+            figure: {
+              tool: 'undo',
+              img: nextState,
+            },
+          }),
+        );
       } else {
         console.log('Невозможно пролистать на следуюшую страницу');
       }

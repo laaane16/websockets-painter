@@ -64,6 +64,22 @@ const Canvas: FC<Props> = (props) => {
   }, [username]);
 
   const drawHandler = (preparedMsg: any) => {
+    const ctx = canvasRef.current?.getContext('2d') as CanvasRenderingContext2D;
+    const img = new Image();
+    const { fillColor, strokeColor, lineWidth } = preparedMsg;
+    const currentFill = ctx.fillStyle;
+    const currentStrokeColor = ctx.strokeStyle;
+    const currentStrokeWidth = ctx.lineWidth;
+    if (fillColor) {
+      ctx.fillStyle = fillColor;
+    }
+    if (strokeColor) {
+      ctx.strokeStyle = strokeColor;
+    }
+    if (lineWidth) {
+      ctx.lineWidth = lineWidth;
+    }
+
     switch (preparedMsg.figure.tool) {
       case 'brush':
         Brush.draw(
@@ -105,7 +121,25 @@ const Canvas: FC<Props> = (props) => {
           preparedMsg.figure.x,
           preparedMsg.figure.y,
         );
+        break;
+      case 'undo':
+        img.src = preparedMsg.figure.img.toString('base64');
+        img.onload = () => {
+          ctx?.clearRect(0, 0, canvasRef.current?.width || 0, canvasRef.current?.height || 0);
+          ctx?.drawImage(img, 0, 0, canvasRef.current?.width || 0, canvasRef.current?.height || 0);
+        };
+        break;
+      case 'redo':
+        img.src = preparedMsg.figure.img.toString('base64');
+        img.onload = () => {
+          ctx?.clearRect(0, 0, canvasRef.current?.width || 0, canvasRef.current?.height || 0);
+          ctx?.drawImage(img, 0, 0, canvasRef.current?.width || 0, canvasRef.current?.height || 0);
+        };
     }
+
+    ctx.fillStyle = currentFill;
+    ctx.strokeStyle = currentStrokeColor;
+    ctx.lineWidth = currentStrokeWidth;
   };
 
   useEffect(() => {
