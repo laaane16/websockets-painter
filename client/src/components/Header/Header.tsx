@@ -9,7 +9,7 @@ interface Props {
   className?: string;
 }
 
-const Header: FC<Props> = (props) => {
+const Header: FC<Props> = () => {
   return (
     <header className={styles.header}>
       <Toolbar />

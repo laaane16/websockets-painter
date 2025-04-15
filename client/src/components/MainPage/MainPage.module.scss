@@ -4,6 +4,8 @@
   color: var(--inverted-color);
   font-family: 'Poppins', sans-serif;
   font-weight: 500;
+  position: relative;
+  overflow: hidden;
 }
 
 .main {
@@ -36,4 +38,18 @@
   top: 25%;
   left: 20%;
   background-color: var(--red-color);
+}
+
+.modal {
+  max-width: 400px;
+}
+
+.welcomeText {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.nickname {
+  display: block;
+  margin-bottom: 10px;
 }

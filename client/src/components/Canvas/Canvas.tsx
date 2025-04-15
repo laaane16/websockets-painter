@@ -1,37 +1,50 @@
-import { FC, useRef, useEffect } from 'react';
+import { FC, useRef, useEffect, useState } from 'react';
 
-import styles from './Canvas.module.scss';
-import { CanvasSchema, useStore } from '../../store/canvasState';
-import { ToolSchema, useToolStore } from '../../store/toolState';
-import { Tool } from '../../tools/Tool';
 import { Brush } from '../../tools/Brush';
 import { Rect } from '../../tools/Rect';
 import { Circle } from '../../tools/Circle';
 import { Eraser } from '../../tools/Eraser';
 import { Line } from '../../tools/Line';
+import { Cursor } from '../Cursor/Cursor';
+
+import { useCanvasStore } from '../../store/canvasState/canvasState';
+import { useToolStore } from '../../store/toolState/toolState';
+
+import { getSetCanvas } from '../../store/canvasState/selectors/getSetCanvas';
+import { getSetTool } from '../../store/toolState/selectors/getSetTool';
+import { getPushToUndo } from '../../store/canvasState/selectors/getPushToUndo';
+import { getUsername } from '../../store/canvasState/selectors/getUsername';
+import { getSetSocket } from '../../store/canvasState/selectors/getSetSocket';
+import { getSetSession } from '../../store/canvasState/selectors/getSetSession';
+import { getSession } from '../../store/canvasState/selectors/getSession';
+
+import styles from './Canvas.module.scss';
 
 interface Props {
   className?: string;
 }
 
-const Canvas: FC<Props> = (props) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const getCanvasSetter = (state: CanvasSchema) => state.setCanvas;
-  const setCanvas = useStore(getCanvasSetter);
-  const getToolSetter = (state: ToolSchema) => state.setTool;
-  const setTool = useToolStore(getToolSetter);
-  const pushToUndo = useStore((state) => state.pushToUndo);
-  const username = useStore((state) => state.username);
-  const id = window.location.pathname.slice(1);
+interface CursorState {
+  position: { x: number; y: number };
+  author: string;
+}
 
-  const setSocket = useStore((state) => state.setSocket);
-  const setSession = useStore((state) => state.setSession);
-  const socket = useStore((state) => state.socket);
-  const session = useStore((state) => state.session);
+const Canvas: FC<Props> = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const setTool = useToolStore(getSetTool);
+  const username = useCanvasStore(getUsername);
+  const [cursors, setCursors] = useState<Record<string, CursorState>>({});
+  const setCanvas = useCanvasStore(getSetCanvas);
+  const pushToUndo = useCanvasStore(getPushToUndo);
+  const setSocket = useCanvasStore(getSetSocket);
+  const setSession = useCanvasStore(getSetSession);
+  const session = useCanvasStore(getSession);
+
+  const id = window.location.pathname.slice(1);
 
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:5000');
-    setTool(new Brush(canvasRef.current as HTMLCanvasElement, socket, session));
+    setTool(new Brush(canvasRef.current as HTMLCanvasElement, socket, session || ''));
     setSocket(socket);
     setSession(id);
     if (username) {
@@ -47,10 +60,15 @@ const Canvas: FC<Props> = (props) => {
 
       socket.onmessage = (msg) => {
         const preparedMsg = JSON.parse(msg.data);
-
+        const author = preparedMsg.username;
         switch (preparedMsg.method) {
           case 'connection':
-            console.log(`Пользователь ${preparedMsg.username} успешно подключился`);
+            if (username !== author) {
+              setCursors({
+                ...cursors,
+                [author]: { author },
+              });
+            }
             break;
           case 'draw':
             drawHandler(preparedMsg);
@@ -58,11 +76,21 @@ const Canvas: FC<Props> = (props) => {
           case 'finish':
             canvasRef.current?.getContext('2d')?.beginPath();
             break;
+          case 'move':
+            setCursors({
+              ...cursors,
+              [author]: {
+                position: { x: preparedMsg.x, y: preparedMsg.y },
+                author,
+              },
+            });
         }
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const drawHandler = (preparedMsg: any) => {
     const ctx = canvasRef.current?.getContext('2d') as CanvasRenderingContext2D;
     const img = new Image();
@@ -160,6 +188,7 @@ const Canvas: FC<Props> = (props) => {
           };
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const mouseDownHandler = async () => {
@@ -185,18 +214,22 @@ const Canvas: FC<Props> = (props) => {
       console.log(e);
     }
   };
-
   return (
-    <div className={styles.canvasContainer}>
-      <canvas
-        onMouseUp={mouseUpHandler}
-        onMouseDown={mouseDownHandler}
-        ref={canvasRef}
-        width={1200}
-        height={700}
-        className={styles.canvas}
-      />
-    </div>
+    <>
+      {Object.values(cursors).map(({ position, author }) => {
+        return <Cursor x={position?.x || 0} y={position?.y || 0} username={author || ''} />;
+      })}
+      <div className={styles.canvasContainer}>
+        <canvas
+          onMouseUp={mouseUpHandler}
+          onMouseDown={mouseDownHandler}
+          ref={canvasRef}
+          width={1200}
+          height={700}
+          className={styles.canvas}
+        />
+      </div>
+    </>
   );
 };
 

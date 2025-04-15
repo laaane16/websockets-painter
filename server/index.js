@@ -43,9 +43,13 @@ app.ws('/', (ws, req) => {
         break;
       case 'draw':
         broadcastConnection(ws, parsedMsg);
+        break;
       case 'finish':
-        broadcastConnection(ws, parsedMsg)
-    
+        broadcastConnection(ws, parsedMsg);
+        break;
+      case 'move':
+        broadcastConnection(ws, parsedMsg);
+        break;
     }
   })
 })

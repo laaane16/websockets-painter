@@ -1,5 +1,5 @@
 import { create } from 'zustand/react';
-import { Tool } from '../tools/Tool';
+import { Tool } from '../../tools/Tool';
 
 export interface ToolSchema {
   tool: Tool | null;

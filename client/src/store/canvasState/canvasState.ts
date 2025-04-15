@@ -6,18 +6,19 @@ export interface CanvasSchema {
   redoList: string[];
   session?: string;
   socket?: WebSocket;
+  username: string;
+
   setCanvas: (el: HTMLCanvasElement) => void;
   pushToUndo: (url: string) => void;
   pushToRedo: (url: string) => void;
   undo: () => void;
   redo: () => void;
-  username: string;
   setUsername: (str: string) => void;
   setSession: (session: string) => void;
   setSocket: (socket: WebSocket) => void;
 }
 
-export const useStore = create<CanvasSchema>((set) => ({
+export const useCanvasStore = create<CanvasSchema>((set) => ({
   canvas: null,
   undoList: [],
   redoList: [],
@@ -41,7 +42,6 @@ export const useStore = create<CanvasSchema>((set) => ({
   undo: () =>
     set((state) => {
       if (state.undoList.length > 0) {
-        const ctx = state.canvas?.getContext('2d');
         const prevState = state.undoList.pop() as string;
         state.redoList.push(state.canvas?.toDataURL() || '');
 
@@ -63,7 +63,6 @@ export const useStore = create<CanvasSchema>((set) => ({
   redo: () =>
     set((state) => {
       if (state.redoList.length > 0) {
-        const ctx = state.canvas?.getContext('2d');
         const nextState = state.redoList.pop() as string;
         state.undoList.push(state.canvas?.toDataURL() || '');
 

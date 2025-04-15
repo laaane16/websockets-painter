@@ -1,44 +1,45 @@
-import { FC, useState } from 'react';
+import { ChangeEvent, FC } from 'react';
+import { ColorPicker, Input } from 'antd';
+import { AggregationColor } from 'antd/es/color-picker/color';
 
 import Container from '../Container/Container';
 
+import { useToolStore } from '../../store/toolState/toolState';
+import { getSetStrokeWidth } from '../../store/toolState/selectors/getSetStrokeWidth';
+import { getSetStrokeColor } from '../../store/toolState/selectors/getSetStrokeColor';
+
 import styles from './Settings.module.scss';
-import { useToolStore } from '../../store/toolState';
-import Input from '../Input/Input';
 
 interface Props {
   className?: string;
 }
 
-const Settings: FC<Props> = (props) => {
-  const { setStrokeWidth, setStrokeColor } = useToolStore((state) => state);
+const Settings: FC<Props> = () => {
+  const setStrokeWidth = useToolStore(getSetStrokeWidth);
+  const setStrokeColor = useToolStore(getSetStrokeColor);
+
+  const handleWidthChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setStrokeWidth(Number(e.target.value));
+
+  const handleColorChange = (color: AggregationColor) => setStrokeColor(color.toHexString());
 
   return (
     <div className={styles.settings}>
       <Container className={styles.settingsContent}>
-        <label htmlFor="line-width" className={styles.title}>
-          Line width
-        </label>
+        <span className={styles.title}>Line width</span>
         <Input
-          id="line-width"
           className={styles.input}
           min={1}
           max={50}
           defaultValue={1}
-          onChange={(e) => setStrokeWidth(Number(e.target.value))}
+          onChange={handleWidthChange}
           type="number"
-          style={{ marginRight: '15px' }}
         />
-
-        <label htmlFor="stroke-color" className={styles.title}>
-          Stroke color
-        </label>
-        <Input
-          style={{ padding: '2px' }}
-          id="stroke-color"
-          className={styles.input}
-          onChange={(e) => setStrokeColor(e.target.value)}
-          type="color"
+        <span className={styles.title}>Stroke color</span>
+        <ColorPicker
+          className={styles.colorPicker}
+          onChange={handleColorChange}
+          defaultValue="black"
         />
       </Container>
     </div>
